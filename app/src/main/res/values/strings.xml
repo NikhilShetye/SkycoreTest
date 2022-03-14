@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">NikhilTestApp</string>
+    <string name="download_pdf">Download PDF</string>
+    <string name="call_api">Call API</string>
+    <string name="user_mobile">User Mobile</string>
+    <string name="user_name">User Name</string>
+    <string name="save_user">Save User</string>
+    <string name="user_name_valid_message">User Name can not be empty!</string>
+    <string name="user_mobile_valid_message">User Mobile can not be empty!</string>
+    <string-array name="books">
+        <item></item>
+        <item>SELECT_BOOK</item>
+        <item>BOOKB</item>
+        <item>BOOKC</item>
+    </string-array>
+</resources>
