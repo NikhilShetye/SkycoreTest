@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/nikhil/Android/Projects/NikhilTest/app/src/main/res/layout/activity_main.xml" value="0.1921875" />
+        <entry key="..\:/nikhil/Android/Projects/NikhilTest/app/src/main/res/layout/item_repo.xml" value="0.16032608695652173" />
+        <entry key="..\:/nikhil/Android/Projects/NikhilTest/app/src/main/res/layout/item_user_info.xml" value="0.16032608695652173" />
         <entry key="..\:/nikhil/Android/Projects/PdfDownload/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/nikhil/Android/Projects/PdfDownload/app/src/main/res/layout/item_recyclerview.xml" value="0.17074275362318841" />
       </map>

@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var repoListAdapter: RepoListAdapter
+    private lateinit var userInfoListAdapter: UserInfoListAdapter
     private val fileName: String = "Pdf_${Date()}.pdf"
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel by viewModels<MainViewModel>()
@@ -73,12 +74,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveUserInfo(userInfoEntity: UserInfoEntity) {
         mainViewModel.saveUserInfo(getDatabase(), userInfoEntity)
+            .observe(this){userInfoList->
+                setUserInfoList(userInfoList)
+            }
     }
 
     private fun setRepoList(list: List<RepoModel>) {
         repoListAdapter = RepoListAdapter(list)
         binding.recyclerview.adapter = repoListAdapter
         binding.recyclerview.layoutManager = LinearLayoutManager(this@MainActivity)
+    }
+    private fun setUserInfoList(list: List<UserInfoEntity>) {
+        userInfoListAdapter = UserInfoListAdapter(list)
+        binding.recyclerviewUserInfo.adapter = userInfoListAdapter
+        binding.recyclerviewUserInfo.layoutManager = LinearLayoutManager(this@MainActivity)
     }
 
     private fun getDatabase(): AppDatabase {

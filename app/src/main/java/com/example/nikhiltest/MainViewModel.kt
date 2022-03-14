@@ -21,6 +21,7 @@ import java.net.URL
 class MainViewModel() : ViewModel() {
 
     private val reposLiveData = MutableLiveData<List<RepoModel>>()
+    private val userInfoLiveData = MutableLiveData<List<UserInfoEntity>>()
 
     fun getRepos(user: String): LiveData<List<RepoModel>> {
         val retrofit = Retrofit.Builder()
@@ -56,13 +57,16 @@ class MainViewModel() : ViewModel() {
         }
     }
 
-    fun saveUserInfo(db: AppDatabase,userInfoEntity: UserInfoEntity) {
+    fun saveUserInfo(db: AppDatabase,userInfoEntity: UserInfoEntity): MutableLiveData<List<UserInfoEntity>> {
         GlobalScope.launch {
             db.userInfoDAO().insertAll(userInfoEntity)
             val data = db.userInfoDAO().getAll()
             data.forEach {
                 println(it)
             }
+            val userInfoList= db.userInfoDAO().getAll()
+            userInfoLiveData.postValue(userInfoList)
         }
+        return userInfoLiveData
     }
 }
