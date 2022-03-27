@@ -1,25 +1,15 @@
-package com.artium.app
+package com.example.skycoretest
 
 import android.app.Application
-import com.artium.app.config.AppConfiguration
-import com.artium.app.util.ArtiumSp
-import com.artium.app.util.Constant
-import com.better.stetho.RetroUtil
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 
 @HiltAndroidApp
-class ArtiumApp : Application() {
-
-    @Inject
-    lateinit var artiumSp: ArtiumSp
+class SkycoreTestApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        RetroUtil.initStethoAccordingly(this)
     }
 
-    fun getBaseUrl() = AppConfiguration.API_BASE_URL
-
-    fun getConfigUrl() = AppConfiguration.CONFIG_URL
+    fun getBaseUrl() = "https://api.yelp.com/v3/businesses/"
+    fun getAuthToken() = "XPFgzKwZGK1yqRxHi0d5xsARFOLpXIvccQj5jekqTnysweGyoIfVUHcH2tPfGq5Oc9kwKHPkcOjk2d1Xobn7aTjOFeop8x41IUfVvg2Y27KiINjYPADcE7Qza0RkX3Yx"
 }

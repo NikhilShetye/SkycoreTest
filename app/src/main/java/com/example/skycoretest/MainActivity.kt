@@ -1,26 +1,17 @@
-package com.example.nikhiltest
+package com.example.skycoretest
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
-import com.example.nikhiltest.databinding.ActivityMainBinding
-import java.util.*
+import com.example.skycoretest.databinding.ActivityMainBinding
+import com.example.skycoretest.dto.BusinessModel
+import com.example.skycoretest.dto.Businesses
+import dagger.hilt.android.AndroidEntryPoint
 
 
-class MainActivity : AppCompatActivity() {
-    companion object {
-        const val BASE_URL = "https://api.github.com/"
-        const val PDF_URL: String = "http://www.africau.edu/images/default/sample.pdf"
-        const val USER: String = "nikhilshetyemobicule"
-    }
-
-    private lateinit var repoListAdapter: RepoListAdapter
+@AndroidEntryPoint
+class MainActivity : BaseActivity() {
     private lateinit var userInfoListAdapter: UserInfoListAdapter
-    private val fileName: String = "Pdf_${Date()}.pdf"
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel by viewModels<MainViewModel>()
 
@@ -28,72 +19,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.btnDownloadPdf.setOnClickListener { downloadPdf(fileName, this@MainActivity) }
-        binding.btnApiCall.setOnClickListener { callApi() }
-        binding.btnSaveUser.setOnClickListener {
-            validateUserData()
-        }
-        binding.spinnerBooks.setSelection(0)
+        callApi(location = "NYC", term = "restaurants")
     }
 
-    private fun validateUserData() {
-        var isValid  =true
-        if(binding.tvUsername.text.trim().isEmpty()) {
-            binding.tvUsername.error = getString(R.string.user_name_valid_message)
-            isValid = false
-        }
-        if(binding.tvUsermobile.text.trim().isEmpty()) {
-            binding.tvUsermobile.error = getString(R.string.user_mobile_valid_message)
-            isValid = false
-        }
-        if(binding.spinnerBooks.selectedItem.toString() == "SELECT_BOOK"){
-            Toast.makeText(this, "Please select Book", Toast.LENGTH_SHORT).show()
-            isValid = false
-        }
-        if(isValid){
-            saveUserInfo(
-                UserInfoEntity(0,
-                    binding.tvUsername.text.trim().toString(),
-                    binding.tvUsermobile.text.trim().toString(),
-                    binding.spinnerBooks.selectedItem.toString()
-                )
-            )
-        }
-    }
-
-    private fun downloadPdf(fileName: String, context: Context) {
-        mainViewModel.downloadPDF(fileName, context)
-    }
-
-    private fun callApi() {
-        mainViewModel.getRepos(USER)
+    private fun callApi(location: String, term: String) {
+        mainViewModel.getRepos(location, term)
             .observe(this) { repoList ->
-                setRepoList(repoList)
+                setUserInfoList(repoList.businesses)
             }
     }
 
-    private fun saveUserInfo(userInfoEntity: UserInfoEntity) {
-        mainViewModel.saveUserInfo(getDatabase(), userInfoEntity)
-            .observe(this){userInfoList->
-                setUserInfoList(userInfoList)
-            }
-    }
-
-    private fun setRepoList(list: List<RepoModel>) {
-        repoListAdapter = RepoListAdapter(list)
-        binding.recyclerview.adapter = repoListAdapter
-        binding.recyclerview.layoutManager = LinearLayoutManager(this@MainActivity)
-    }
-    private fun setUserInfoList(list: List<UserInfoEntity>) {
+    private fun setUserInfoList(list: List<Businesses>) {
         userInfoListAdapter = UserInfoListAdapter(list)
         binding.recyclerviewUserInfo.adapter = userInfoListAdapter
         binding.recyclerviewUserInfo.layoutManager = LinearLayoutManager(this@MainActivity)
     }
 
-    private fun getDatabase(): AppDatabase {
-        return Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "user-info.db"
-        ).build()
-    }
 }

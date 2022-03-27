@@ -1,4 +1,4 @@
-package com.example.nikhiltest
+package com.example.skycoretest
 
 import org.junit.Test
 

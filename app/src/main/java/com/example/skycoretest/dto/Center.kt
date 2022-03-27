@@ -1,4 +1,4 @@
-package com.example.skycoretest
+package com.example.skycoretest.dto
 
 import com.google.gson.annotations.SerializedName
 

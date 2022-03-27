@@ -1,4 +1,4 @@
-package com.example.nikhiltest
+package com.example.skycoretest
 
 import android.app.DownloadManager
 import android.content.Context
@@ -9,6 +9,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.artium.app.extensions.onException
+import com.artium.app.extensions.onFailure
+import com.artium.app.extensions.onSuccess
+import com.artium.app.network.ApiService
+import com.artium.app.network.Receptor
+import com.example.skycoretest.dto.BusinessModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,56 +24,31 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.MalformedURLException
 import java.net.URL
+import javax.inject.Inject
 
-class MainViewModel() : ViewModel() {
+@HiltViewModel
+class MainViewModel  @Inject constructor(
+    private val artiumApp: SkycoreTestApp,
+    private val userRepo: UserRepo
+) : ViewModel() {
 
-    private val reposLiveData = MutableLiveData<List<RepoModel>>()
-    private val userInfoLiveData = MutableLiveData<List<UserInfoEntity>>()
+    private val reposLiveData = MutableLiveData<BusinessModel>()
 
-    fun getRepos(user: String): LiveData<List<RepoModel>> {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(MainActivity.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val service = retrofit.create(GitHubService::class.java)
-
+    fun getRepos(location: String,term : String): LiveData<BusinessModel> {
         if (reposLiveData.value == null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val repos: Call<List<RepoModel>> = service.listRepos(user)
-                reposLiveData.postValue(repos.execute().body())
+                userRepo.listRepos(location,term)
+                    .onSuccess {
+                        getResponse()?.let {
+                            reposLiveData.postValue(it)
+                        }
+                    }.onFailure {
+                        getErrorMsg()
+                    }.onException {
+                        getThrowable()?.message
+                    }
             }
         }
         return reposLiveData
-    }
-
-    fun downloadPDF(fileName: String, context: Context) {
-        try {
-            val url = URL(MainActivity.PDF_URL)
-            val request = DownloadManager.Request(Uri.parse(url.toString()))
-            request.setTitle(fileName)
-            request.setMimeType("application/pdf")
-            request.setAllowedOverMetered(true)
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                "SampleFiles/$fileName")
-            val downloadManager =
-                context.getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
-            downloadManager.enqueue(request)
-        } catch (e: MalformedURLException) {
-            e.printStackTrace()
-        }
-    }
-
-    fun saveUserInfo(db: AppDatabase,userInfoEntity: UserInfoEntity): MutableLiveData<List<UserInfoEntity>> {
-        GlobalScope.launch {
-            db.userInfoDAO().insertAll(userInfoEntity)
-            val data = db.userInfoDAO().getAll()
-            data.forEach {
-                println(it)
-            }
-            val userInfoList= db.userInfoDAO().getAll()
-            userInfoLiveData.postValue(userInfoList)
-        }
-        return userInfoLiveData
     }
 }
